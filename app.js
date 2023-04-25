@@ -22,9 +22,13 @@ app.locals.title = `${capitalized(projectName)}- Generated with Ironlauncher`
 
 // 👇 Start handling routes here
 const index = require('./routes/index')
-app.use('/', index)
+app.use('/', index);
+
+const authRoutes = require('./routes/auth.routes')
+const { isLoggedOut } = require('./middleware/route.guard')
+app.use('/', isLoggedOut, authRoutes);
 
 // ❗ To handle errors. Routes that don't exist or errors that you handle in specific routes
 require('./error-handling')(app)
 
-module.exports = app
+module.exports = app;
