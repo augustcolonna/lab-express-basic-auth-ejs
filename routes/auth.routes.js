@@ -1,5 +1,4 @@
-const express = require('express')
-const router = express.Router();
+const router = require('express').Router();
 const User = require('../models/User.model')
 const bcryptjs = require('bcryptjs');
 const saltRounds = 13;
@@ -17,7 +16,7 @@ router.get('/signup', (req, res) => {
 })
 
 //create new user - POST
-router.post('/signup', async (req, res, next) => {
+router.post('signup', async (req, res, next) => {
    try{
     const potentialUser = await User.findOne({ username: req.body.username })
     if(!potentialUser){
@@ -44,26 +43,29 @@ router.get('/login', (req, res) => {
 });
 
 //take values and check against DB
-router.post('/login', async (req, res) => {
+router.post('login', async (req, res) => {
     console.log(req.session)
     try{
-        const userExists = await User.findOne({ username: req.body.username })
-        console.log(user)
-        if(!!user){
-            if(bcryptjs.compareSync(req.body.password, user.passwordHash)){
-                req.session.user =  { username: user.username }
-                res.redirect('/profile')
-            }
-            else {
-                res.render('auth/login', { errorMessage: 'Wrong password, try again' })   
-            }}
-            else {
-                res.render('auth/login', { errorMessage: 'That username does not exist' })
-            }
+        const foundUser = await User.findOne({ username: req.body.username })
+        console.log(foundUser)
+        if(foundUser){
+            const passwordMatch = bcryptjs.compareSync(req.body.password, foundUser.passwordHash)
+        }
+        if(passwordMatch){
+            req.session.foundUser =  { username: foundUser.username }
+            res.redirect('/profile')      
+         }
+        else {
+            res.redirect('auth/login')
+        }
     }
     catch(error){
         console.log(error)
     }
+})
+
+router.get('/profile', (req,res) => {
+    res.render('/users/profile');
 })
 
 module.exports = router;

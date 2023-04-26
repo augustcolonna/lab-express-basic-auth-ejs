@@ -6,11 +6,11 @@ router.get("/", (req, res, next) => {
   res.render("index");
 });
 
-router.get('/profile', isLoggedIn, (req, res, next) => {
+router.get('/profile', (req, res, next) => {
   res.render('/users/profile', { user: req.session.user })
 })
 
-router.get('/logout', (req, res, next) => {
+router.get('/logout', isLoggedIn, (req, res, next) => {
   req.session.destroy(err => {
     if (err) next(err)
     res.redirect('/')
